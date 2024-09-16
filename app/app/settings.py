@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'djoser',
     'imagekit',
+    'drf_yasg',
     'products.apps.ProductsConfig',
     'api.apps.ApiConfig',
 ]
@@ -140,4 +141,14 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
+}
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Token': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+        },
+    },
 }
