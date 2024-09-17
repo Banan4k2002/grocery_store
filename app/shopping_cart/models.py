@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
 from django.db import models
 
 from products.models import Product
@@ -19,7 +20,11 @@ class ShoppingCart(models.Model):
         related_name='carts',
         verbose_name='Продукт',
     )
-    quantity = models.PositiveIntegerField('Количество', default=1)
+    quantity = models.PositiveIntegerField(
+        'Количество',
+        default=1,
+        validators=(MinValueValidator(1),),
+    )
 
     class Meta:
         verbose_name = 'корзину'
@@ -29,3 +34,6 @@ class ShoppingCart(models.Model):
                 fields=('user', 'product'), name='unique_user_product'
             ),
         )
+
+    def __str__(self):
+        return f'{self.product} в количестве {self.quantity}'
