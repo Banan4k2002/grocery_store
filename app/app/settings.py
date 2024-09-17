@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'imagekit',
     'drf_yasg',
     'products.apps.ProductsConfig',
+    'shopping_cart.apps.ShoppingCartConfig',
     'api.apps.ApiConfig',
 ]
 
