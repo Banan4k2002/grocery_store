@@ -1,6 +1,9 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
+from rest_framework.validators import ValidationError
 
 from products.models import Category, Product
+from shopping_cart.models import ShoppingCart
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -40,3 +43,49 @@ class ProductSerializer(serializers.ModelSerializer):
             request.build_absolute_uri(obj.image_large.url),
         )
         return images
+
+
+class ShoppingCartSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
+
+    class Meta:
+        model = ShoppingCart
+        fields = ('product', 'quantity')
+
+    def create(self, validated_data):
+        product = get_object_or_404(
+            Product, pk=self.context['view'].kwargs.get('pk')
+        )
+        user = self.context['request'].user
+        validated_data['product'] = product
+        validated_data['user'] = user
+        return ShoppingCart.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.quantity = validated_data.get('quantity', instance.quantity)
+        instance.save()
+        return instance
+
+    def validate(self, data):
+        request = self.context['request']
+        product = get_object_or_404(
+            Product, pk=self.context['view'].kwargs.get('pk')
+        )
+        user = request.user
+        data['product'] = product
+        data['user'] = user
+        if (
+            request.method == 'POST'
+            and ShoppingCart.objects.filter(
+                product=data['product'],
+                user=data['user'],
+            ).exists()
+        ):
+            raise ValidationError({'errors': 'Продукт уже добавлен в корзину'})
+        return data
+
+
+class ShoppingCartListSerializer(serializers.Serializer):
+    products = ShoppingCartSerializer(many=True)
+    total_quantity = serializers.IntegerField()
+    total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
