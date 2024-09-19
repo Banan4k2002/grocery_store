@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.core.validators import MinValueValidator
 from django.db import models
 from imagekit.models import ImageSpecField
@@ -64,7 +65,7 @@ class Product(BaseModel):
         'Цена',
         max_digits=10,
         decimal_places=2,
-        validators=(MinValueValidator(0),),
+        validators=(MinValueValidator(Decimal(0.00)),),
     )
     image_small = ImageSpecField(
         source='image',
@@ -82,3 +83,4 @@ class Product(BaseModel):
     class Meta:
         verbose_name = 'продукт'
         verbose_name_plural = 'Продукты'
+        ordering = ('id',)
