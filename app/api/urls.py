@@ -8,7 +8,7 @@ router = DefaultRouter()
 router.register(r'products', ProductViewSet)
 
 urlpatterns = [
-    path('categories/', CategoryList.as_view()),
+    path('categories/', CategoryList.as_view(), name='category-list'),
     path('', include(router.urls)),
     path('', include('djoser.urls')),
     path('', include('djoser.urls.authtoken')),
