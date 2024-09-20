@@ -1,11 +1,18 @@
 from io import BytesIO
-from rest_framework.test import APIClient
-from django.core.files.images import ImageFile
+
 import pytest
+from django.core.files.images import ImageFile
 from PIL import Image
 from rest_framework.authtoken.models import Token
-from shopping_cart.models import ShoppingCart
+from rest_framework.test import APIClient
+
 from products.models import Category, Product, Subcategory
+from shopping_cart.models import ShoppingCart
+
+
+@pytest.fixture(autouse=True)
+def enable_db_access_for_all_tests(db):
+    pass
 
 
 @pytest.fixture

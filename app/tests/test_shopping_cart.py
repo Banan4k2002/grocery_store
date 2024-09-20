@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 import pytest
 from django.urls import reverse
 from rest_framework import status
@@ -6,7 +7,6 @@ from rest_framework import status
 from shopping_cart.models import ShoppingCart
 
 
-@pytest.mark.django_db
 def test_add_product_to_cart(user_client, user, product_1):
     url = reverse('product-shopping-cart', kwargs={'pk': product_1.pk})
     response = user_client.post(url)
@@ -15,7 +15,6 @@ def test_add_product_to_cart(user_client, user, product_1):
     assert ShoppingCart.objects.filter(user=user, product=product_1).exists()
 
 
-@pytest.mark.django_db
 def test_add_product_to_cart_exists(user_client, shopping_cart_item_1):
     product = shopping_cart_item_1.product
     url = reverse('product-shopping-cart', kwargs={'pk': product.pk})
@@ -25,7 +24,6 @@ def test_add_product_to_cart_exists(user_client, shopping_cart_item_1):
     assert 'Продукт уже добавлен в корзину' in response.data['errors']
 
 
-@pytest.mark.django_db
 def test_change_product_quantity(user_client, shopping_cart_item_1):
     url = reverse(
         'product-shopping-cart', kwargs={'pk': shopping_cart_item_1.product.pk}
@@ -38,7 +36,6 @@ def test_change_product_quantity(user_client, shopping_cart_item_1):
     assert shopping_cart_item_1.quantity == data['quantity']
 
 
-@pytest.mark.django_db
 def test_change_product_quantity_non_exists(user_client, product_1):
     url = reverse('product-shopping-cart', kwargs={'pk': product_1.pk})
     data = {'quantity': 5}
@@ -48,7 +45,6 @@ def test_change_product_quantity_non_exists(user_client, product_1):
     assert 'Данного продукта нет в корзине' in response.data['errors']
 
 
-@pytest.mark.django_db
 def test_remove_product_from_cart(user_client, shopping_cart_item_1):
     url = reverse(
         'product-shopping-cart', kwargs={'pk': shopping_cart_item_1.product.pk}
@@ -59,7 +55,6 @@ def test_remove_product_from_cart(user_client, shopping_cart_item_1):
     assert not ShoppingCart.objects.filter(pk=shopping_cart_item_1.pk).exists()
 
 
-@pytest.mark.django_db
 def test_remove_product_from_cart_non_exists(user_client, product_1):
     url = reverse('product-shopping-cart', kwargs={'pk': product_1.pk})
     response = user_client.delete(url)
@@ -68,7 +63,6 @@ def test_remove_product_from_cart_non_exists(user_client, product_1):
     assert 'Данного продукта нет в корзине' in response.data['errors']
 
 
-@pytest.mark.django_db
 def test_cart_list(user_client, shopping_cart_item_1, shopping_cart_item_2):
     url = reverse('product-get-shopping-cart')
     response = user_client.get(url)
@@ -89,7 +83,6 @@ def test_cart_list(user_client, shopping_cart_item_1, shopping_cart_item_2):
     assert Decimal(response.data['total_price']) == total_price
 
 
-@pytest.mark.django_db
 def test_cart_clear(
     user_client, shopping_cart_item_1, shopping_cart_item_2, user
 ):
@@ -110,7 +103,6 @@ def test_cart_clear(
         ('product-clear-shopping-cart', 'delete', {}),
     ),
 )
-@pytest.mark.django_db
 def test_shopping_cart_not_auth(
     client, product_1, reverse_path, method, kwargs
 ):
@@ -129,10 +121,8 @@ def test_shopping_cart_not_auth(
 
 
 @pytest.mark.parametrize('method', ('post', 'patch', 'delete'))
-@pytest.mark.django_db
 def test_product_not_exists(user_client, method):
     url = reverse('product-shopping-cart', kwargs={'pk': 1})
-
     if method == 'post':
         response = user_client.post(url)
     elif method == 'patch':
