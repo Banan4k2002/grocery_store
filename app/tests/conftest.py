@@ -4,6 +4,7 @@ from django.core.files.images import ImageFile
 import pytest
 from PIL import Image
 from rest_framework.authtoken.models import Token
+from shopping_cart.models import ShoppingCart
 from products.models import Category, Product, Subcategory
 
 
@@ -55,6 +56,16 @@ def user(django_user_model):
     return django_user_model.objects.create_user(
         username='TestUser', password='password'
     )
+
+
+@pytest.fixture
+def shopping_cart_item_1(user, product_1):
+    return ShoppingCart.objects.create(user=user, product=product_1)
+
+
+@pytest.fixture
+def shopping_cart_item_2(user, product_2):
+    return ShoppingCart.objects.create(user=user, product=product_2)
 
 
 @pytest.fixture
